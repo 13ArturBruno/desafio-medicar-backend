@@ -1,8 +1,4 @@
 from django.db import models
-
-# Create your models here.
-from django.db.models import UniqueConstraint
-
 from agenda.models import Horario, Agenda
 from medico.models import Medico
 
@@ -13,4 +9,11 @@ class Consulta(models.Model):
     horario = models.ForeignKey(Horario, on_delete=models.CASCADE)
     data_agendamento = models.DateTimeField(auto_now_add=True)
     medico = models.ForeignKey(Medico, on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ['dia', 'horario__horario']
+
+    def __str__(self):
+        return self.medico.nome + ' / ' + str(self.dia) + ' / ' + str(self.horario.horario)
+
 

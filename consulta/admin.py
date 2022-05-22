@@ -1,8 +1,11 @@
-from time import timezone
-
 from django.contrib import admin
-
-# Register your models here.
 from consulta.models import Consulta
 
-admin.site.register(Consulta)
+
+@admin.register(Consulta)
+class ConsultaAdmin(admin.ModelAdmin):
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False

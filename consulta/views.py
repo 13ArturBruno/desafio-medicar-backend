@@ -1,39 +1,29 @@
-from django.http import HttpResponse, Http404
-from django.shortcuts import render
-
 # Create your views here.
 
-from rest_framework import viewsets, status
-from rest_framework.response import Response
-
-from agenda.models import Agenda, Horario
-from medico.models import Medico
+from django.utils import timezone
+from rest_framework import viewsets
+from utils.mixins import MultiSerializerMixin
 from .models import Consulta
-from .serializer import ConsultaSerializer
+from django.db.models import Q
+
+from .serializer import WriteConsultaSerializer, ReadConsultaSerializer
 
 
-class ConsultaViewSet(viewsets.ModelViewSet):
-    queryset = Consulta.objects.all()
-    serializer_class = ConsultaSerializer
+class ConsultaViewSet(MultiSerializerMixin, viewsets.ModelViewSet):
+    serializer_class = ReadConsultaSerializer
+    serializer_action_map = {
+        'create': WriteConsultaSerializer,
+    }
 
-    def list(self, request):
-        serializer = self.get_serializer(self.get_queryset(), many=True)
-        return Response(serializer.data)
-
-    def create(self, request, *args, **kwargs):
-        agenda = Agenda.objects.all().get(id=request.data.get('agenda_id'))
-        horario = Horario.objects.get(agenda=agenda, horario=request.data.get('horario'))
-        medico = Medico.objects.get(id=agenda.medico.id)
-
-        consulta = Consulta.objects.create(
-            agenda=agenda,
-            dia=agenda.dia,
-            horario=horario,
-            medico=medico
+    def get_queryset(self):
+        qs = Consulta.objects.filter(
+            Q(dia__gt=timezone.now().date()) |
+            (Q(dia=timezone.now().date()) & Q(horario__horario__gt=timezone.now().time()))
         )
+        return qs
 
-        serializer = self.get_serializer(consulta)
-        return Response(serializer.data)
+
+
 
 
 

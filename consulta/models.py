@@ -9,6 +9,7 @@ class Consulta(models.Model):
     horario = models.ForeignKey(Horario, on_delete=models.CASCADE)
     data_agendamento = models.DateTimeField(auto_now_add=True)
     medico = models.ForeignKey(Medico, on_delete=models.CASCADE)
+    trello_card_id = models.CharField(blank=True, max_length=300)
 
     class Meta:
         ordering = ['dia', 'horario__horario']

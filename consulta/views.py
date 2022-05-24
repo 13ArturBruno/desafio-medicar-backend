@@ -1,8 +1,11 @@
 # Create your views here.
-
+from django.http import Http404
 from django.utils import timezone
-from rest_framework import viewsets
+from rest_framework import viewsets, status
+from rest_framework.response import Response
+
 from utils.mixins import MultiSerializerMixin
+from utils.trello import delete_card
 from .models import Consulta
 from django.db.models import Q
 
@@ -22,9 +25,16 @@ class ConsultaViewSet(MultiSerializerMixin, viewsets.ModelViewSet):
         )
         return qs
 
+    def destroy(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
 
+            try:
+                delete_card(instance.trello_card_id)
+            except:
+                pass
 
-
-
-
-
+            self.perform_destroy(instance)
+        except Http404:
+            pass
+        return Response(status=status.HTTP_204_NO_CONTENT)

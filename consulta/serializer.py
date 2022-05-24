@@ -1,3 +1,5 @@
+from abc import ABC
+
 from django.utils import timezone
 from rest_framework import serializers
 
@@ -5,6 +7,7 @@ from agenda.models import Agenda, Horario
 from consulta.models import Consulta
 from medico.models import Medico
 from medico.serializers import MedicoSerializer
+from utils.trello import create_card
 
 
 class ReadConsultaSerializer(serializers.ModelSerializer):
@@ -61,6 +64,19 @@ class WriteConsultaSerializer(serializers.Serializer):
             horario=horario,
             medico=medico
         )
+
+        try:
+            params = {
+                'dia': consulta.dia,
+                'horario': consulta.horario,
+                'medico': medico.nome
+            }
+
+            consulta.trello_card_id = create_card(params)
+            consulta.save()
+
+        except Exception as e:
+            pass
 
         return consulta
 

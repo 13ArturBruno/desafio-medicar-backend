@@ -23,9 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-*k9akia426zsc8uf(dt6yb%oj5h(&(11&89d6tau8iugth=7dt'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', True)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -92,7 +92,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 
 # aplicação sem .env
-DB_ENGINE = os.getenv('DB_ENGINE', 'postgres').lower() or 'postgres'
+DB_ENGINE = os.getenv('DB_ENGINE', 'postgres').lower()
 
 DATABASE_ENGINE_MAP = {
     'postgres': 'django.db.backends.postgresql_psycopg2',
